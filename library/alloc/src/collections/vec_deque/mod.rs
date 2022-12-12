@@ -97,6 +97,7 @@ mod tests;
 pub struct VecDeque<
     T,
     #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
+    const COOP_PREFERRED: bool = true
 >
 where [(); alloc::co_alloc_metadata_num_slots::<A>()]:
 {
@@ -107,7 +108,7 @@ where [(); alloc::co_alloc_metadata_num_slots::<A>()]:
     // if `len == 0`, the exact value of `head` is unimportant.
     // if `T` is zero-Sized, then `self.len <= usize::MAX`, otherwise `self.len <= isize::MAX as usize`.
     len: usize,
-    buf: RawVec<T, A>,
+    buf: RawVec<T, A, COOP_PREFERRED>,
 }
 
 #[stable(feature = "rust1", since = "1.0.0")]
