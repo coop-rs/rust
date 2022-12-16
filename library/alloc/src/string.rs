@@ -2337,13 +2337,10 @@ impl_eq! { Cow<'a, str>, String }
 
 #[stable(feature = "rust1", since = "1.0.0")]
 #[rustc_const_unstable(feature = "const_default_impls", issue = "87864")]
-impl<const COOP_PREFERRED: bool> const Default for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl const Default for String {
     /// Creates an empty `String`.
     #[inline]
-    fn default() -> String<COOP_PREFERRED> {
+    fn default() -> String {
         String::new()
     }
 }
@@ -2813,45 +2810,36 @@ where
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "rust1", since = "1.0.0")]
-impl<const COOP_PREFERRED: bool> From<&str> for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<&str> for String {
     /// Converts a `&str` into a [`String`].
     ///
     /// The result is allocated on the heap.
     #[inline]
-    fn from(s: &str) -> String<COOP_PREFERRED> {
+    fn from(s: &str) -> String {
         s.to_owned()
     }
 }
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "from_mut_str_for_string", since = "1.44.0")]
-impl<const COOP_PREFERRED: bool> From<&mut str> for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<&mut str> for String {
     /// Converts a `&mut str` into a [`String`].
     ///
     /// The result is allocated on the heap.
     #[inline]
-    fn from(s: &mut str) -> String<COOP_PREFERRED> {
+    fn from(s: &mut str) -> String {
         s.to_owned()
     }
 }
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "from_ref_string", since = "1.35.0")]
-impl<const COOP_PREFERRED: bool> From<&String<COOP_PREFERRED>> for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<&String> for String {
     /// Converts a `&String` into a [`String`].
     ///
     /// This clones `s` and returns the clone.
     #[inline]
-    fn from(s: &String<COOP_PREFERRED>) -> String<COOP_PREFERRED> {
+    fn from(s: &String) -> String {
         s.clone()
     }
 }
@@ -2881,10 +2869,7 @@ impl From<Box<str>> for String {
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "box_from_str", since = "1.20.0")]
-impl<const COOP_PREFERRED: bool> From<String<COOP_PREFERRED>> for Box<str>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<String> for Box<str> {
     /// Converts the given [`String`] to a boxed `str` slice that is owned.
     ///
     /// # Examples
@@ -2898,17 +2883,14 @@ where
     ///
     /// assert_eq!("hello world", s3)
     /// ```
-    fn from(s: String<COOP_PREFERRED>) -> Box<str> {
+    fn from(s: String) -> Box<str> {
         s.into_boxed_str()
     }
 }
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "string_from_cow_str", since = "1.14.0")]
-impl<'a, const COOP_PREFERRED: bool> From<Cow<'a, str>> for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl<'a> From<Cow<'a, str>> for String {
     /// Converts a clone-on-write string to an owned
     /// instance of [`String`].
     ///
@@ -2925,7 +2907,7 @@ where
     /// let owned: String = String::from(cow);
     /// assert_eq!(&owned[..], "eggplant");
     /// ```
-    fn from(s: Cow<'a, str>) -> String<COOP_PREFERRED> {
+    fn from(s: Cow<'a, str>) -> String {
         s.into_owned()
     }
 }
@@ -2953,10 +2935,7 @@ impl<'a> From<&'a str> for Cow<'a, str> {
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "rust1", since = "1.0.0")]
-impl<'a, const COOP_PREFERRED: bool> From<String<COOP_PREFERRED>> for Cow<'a, str>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl<'a> From<String> for Cow<'a, str> {
     /// Converts a [`String`] into an [`Owned`] variant.
     /// No heap allocation is performed, and the string
     /// is not copied.
@@ -2972,17 +2951,14 @@ where
     ///
     /// [`Owned`]: crate::borrow::Cow::Owned "borrow::Cow::Owned"
     #[inline]
-    fn from(s: String<COOP_PREFERRED>) -> Cow<'a, str> {
+    fn from(s: String) -> Cow<'a, str> {
         Cow::Owned(s)
     }
 }
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "cow_from_string_ref", since = "1.28.0")]
-impl<'a, const COOP_PREFERRED: bool> From<&'a String<COOP_PREFERRED>> for Cow<'a, str>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl<'a> From<&'a String> for Cow<'a, str> {
     /// Converts a [`String`] reference into a [`Borrowed`] variant.
     /// No heap allocation is performed, and the string
     /// is not copied.
@@ -2997,7 +2973,7 @@ where
     ///
     /// [`Borrowed`]: crate::borrow::Cow::Borrowed "borrow::Cow::Borrowed"
     #[inline]
-    fn from(s: &'a String<COOP_PREFERRED>) -> Cow<'a, str> {
+    fn from(s: &'a String) -> Cow<'a, str> {
         Cow::Borrowed(s.as_str())
     }
 }
@@ -3030,10 +3006,7 @@ where
 }
 
 #[stable(feature = "from_string_for_vec_u8", since = "1.14.0")]
-impl<const COOP_PREFERRED: bool> From<String<COOP_PREFERRED>> for Vec<u8, Global, COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<String> for Vec<u8> {
     /// Converts the given [`String`] to a vector [`Vec`] that holds values of type [`u8`].
     ///
     /// # Examples
@@ -3048,7 +3021,7 @@ where
     ///     println!("{b}");
     /// }
     /// ```
-    fn from(string: String<COOP_PREFERRED>) -> Vec<u8, Global, COOP_PREFERRED> {
+    fn from(string: String) -> Vec<u8> {
         string.into_bytes()
     }
 }
@@ -3211,10 +3184,7 @@ impl<const COOP_PREFERRED: bool> FusedIterator for Drain<'_, COOP_PREFERRED> whe
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "from_char_for_string", since = "1.46.0")]
-impl<const COOP_PREFERRED: bool> From<char> for String<COOP_PREFERRED>
-where
-    [(); crate::co_alloc_metadata_num_slots_with_preference_global(COOP_PREFERRED)]:,
-{
+impl From<char> for String {
     /// Allocates an owned [`String`] from a single character.
     ///
     /// # Example
