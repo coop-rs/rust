@@ -70,7 +70,7 @@
 #[cfg(test)]
 mod tests;
 
-use crate::alloc::{Global, self};
+use crate::alloc::{self, Global};
 use crate::borrow::{Borrow, Cow};
 use crate::cmp;
 use crate::collections::TryReserveError;
