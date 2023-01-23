@@ -1,12 +1,14 @@
 #[cfg(test)]
 mod tests;
 
+use crate::alloc::Global;
 use crate::borrow::{Cow, ToOwned};
 use crate::boxed::Box;
 use crate::rc::Rc;
 use crate::slice::hack::into_vec;
 use crate::string::String;
 use crate::vec::Vec;
+use crate::DEFAULT_COOP_PREFERRED;
 use core::borrow::Borrow;
 use core::ffi::{c_char, CStr};
 use core::fmt;
@@ -17,8 +19,6 @@ use core::ptr;
 use core::slice;
 use core::slice::memchr;
 use core::str::{self, Utf8Error};
-use crate::alloc::Global;
-use crate::DEFAULT_COOP_PREFERRED;
 
 #[cfg(target_has_atomic = "ptr")]
 use crate::sync::Arc;
@@ -730,7 +730,8 @@ impl fmt::Debug for CString {
 #[stable(feature = "cstring_into", since = "1.7.0")]
 #[allow(unused_braces)]
 impl<const COOP_PREFERRED: bool> From<CString> for Vec<u8, Global, COOP_PREFERRED>
-where [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     /// Converts a [`CString`] into a <code>[Vec]<[u8]></code>.
     ///
@@ -761,7 +762,8 @@ impl Borrow<CStr> for CString {
 
 #[stable(feature = "cstring_from_cow_cstr", since = "1.28.0")]
 impl<'a, const COOP_PREFERRED: bool> From<Cow<'a, CStr, COOP_PREFERRED>> for CString
-where     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     /// Converts a `Cow<'a, CStr>` into a `CString`, by copying the contents if they are
     /// borrowed.
@@ -784,7 +786,8 @@ impl From<&CStr> for Box<CStr> {
 
 #[stable(feature = "box_from_cow", since = "1.45.0")]
 impl<const COOP_PREFERRED: bool> From<Cow<'_, CStr, COOP_PREFERRED>> for Box<CStr>
-where [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     /// Converts a `Cow<'a, CStr>` into a `Box<CStr>`,
     /// by copying the contents if they are borrowed.
@@ -1123,7 +1126,8 @@ impl CStr {
                   without modifying the original"]
     #[stable(feature = "cstr_to_str", since = "1.4.0")]
     pub fn to_string_lossy<const COOP_PREFERRED: bool>(&self) -> Cow<'_, str, COOP_PREFERRED>
-    where    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+    where
+        [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
     {
         // false = no need for co-alloc metadata, since it would get lost once converted to the slice.
         String::<COOP_PREFERRED>::from_utf8_lossy_co(self.to_bytes())
