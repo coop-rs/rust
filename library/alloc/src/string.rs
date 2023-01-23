@@ -370,7 +370,7 @@ use crate::DEFAULT_COOP_PREFERRED;
 #[stable(feature = "rust1", since = "1.0.0")]
 #[cfg_attr(not(test), lang = "String")]
 #[allow(unused_braces)]
-pub struct String<const COOP_PREFERRED: bool = {DEFAULT_COOP_PREFERRED!()}>
+pub struct String<const COOP_PREFERRED: bool = { DEFAULT_COOP_PREFERRED!() }>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
@@ -587,7 +587,9 @@ where
     /// [`into_bytes`]: String::into_bytes
     #[inline]
     #[stable(feature = "rust1", since = "1.0.0")]
-    pub fn from_utf8(vec: Vec<u8, Global, COOP_PREFERRED>) -> Result<String<COOP_PREFERRED>, FromUtf8Error<COOP_PREFERRED>> {
+    pub fn from_utf8(
+        vec: Vec<u8, Global, COOP_PREFERRED>,
+    ) -> Result<String<COOP_PREFERRED>, FromUtf8Error<COOP_PREFERRED>> {
         match str::from_utf8(&vec) {
             Ok(..) => Ok(String { vec }),
             Err(e) => Err(FromUtf8Error { bytes: vec, error: e }),
@@ -595,7 +597,11 @@ where
     }
 
     /// Like `from_utf8_lossy`, but this honors COOP_PREFERRED.
-    #[unstable(feature = "string_from_utf8_lossy_co", reason = "confirm_or_fix_the_function_name", issue = "none")]
+    #[unstable(
+        feature = "string_from_utf8_lossy_co",
+        reason = "confirm_or_fix_the_function_name",
+        issue = "none"
+    )]
     pub fn from_utf8_lossy_co(v: &[u8]) -> Cow<'_, str, COOP_PREFERRED> {
         let mut iter = Utf8Chunks::new(v);
 
@@ -685,8 +691,8 @@ impl String {
     #[cfg(not(no_global_oom_handling))]
     #[stable(feature = "rust1", since = "1.0.0")]
     #[allow(unused_braces)]
-    pub fn from_utf8_lossy(v: &[u8]) -> Cow<'_, str, {DEFAULT_COOP_PREFERRED!()}> {
-        String::<{DEFAULT_COOP_PREFERRED!()}>::from_utf8_lossy_co(v)
+    pub fn from_utf8_lossy(v: &[u8]) -> Cow<'_, str, { DEFAULT_COOP_PREFERRED!() }> {
+        String::<{ DEFAULT_COOP_PREFERRED!() }>::from_utf8_lossy_co(v)
     }
 }
 
@@ -1500,7 +1506,9 @@ where
     {
         struct SetLenOnDrop<'a, const LOCAL_COOP_PREFERRED: bool>
         where
-        [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(LOCAL_COOP_PREFERRED)]:,
+            [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(
+                LOCAL_COOP_PREFERRED,
+            )]:,
         {
             s: &'a mut String<LOCAL_COOP_PREFERRED>,
             idx: usize,
@@ -1509,7 +1517,9 @@ where
 
         impl<'a, const LOCAL_COOP_PREFERRED: bool> Drop for SetLenOnDrop<'a, LOCAL_COOP_PREFERRED>
         where
-        [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(LOCAL_COOP_PREFERRED)]:,
+            [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(
+                LOCAL_COOP_PREFERRED,
+            )]:,
         {
             fn drop(&mut self) {
                 let new_len = self.idx - self.del_bytes;
@@ -1937,9 +1947,10 @@ where
     }
 }
 
-impl <const COOP_PREFERRED: bool> FromUtf8Error<COOP_PREFERRED>
+impl<const COOP_PREFERRED: bool> FromUtf8Error<COOP_PREFERRED>
 where
-[(); alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:, {
+    [(); alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+{
     /// Returns a slice of [`u8`]s bytes that were attempted to convert to a `String`.
     ///
     /// # Examples
@@ -2146,11 +2157,14 @@ where
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "herd_cows", since = "1.19.0")]
-impl<'a, const COOP_PREFERRED: bool> FromIterator<Cow<'a, str, COOP_PREFERRED>> for String<COOP_PREFERRED>
+impl<'a, const COOP_PREFERRED: bool> FromIterator<Cow<'a, str, COOP_PREFERRED>>
+    for String<COOP_PREFERRED>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
-    fn from_iter<I: IntoIterator<Item = Cow<'a, str, COOP_PREFERRED>>>(iter: I) -> String<COOP_PREFERRED> {
+    fn from_iter<I: IntoIterator<Item = Cow<'a, str, COOP_PREFERRED>>>(
+        iter: I,
+    ) -> String<COOP_PREFERRED> {
         let mut iterator = iter.into_iter();
 
         // Because we're iterating over CoWs, we can (potentially) avoid at least
@@ -2231,7 +2245,8 @@ where
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "box_str2", since = "1.45.0")]
 impl<const COOP_PREFERRED: bool> Extend<Box<str>> for String<COOP_PREFERRED>
-where [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     fn extend<I: IntoIterator<Item = Box<str>>>(&mut self, iter: I) {
         iter.into_iter().for_each(move |s| self.push_str(&s));
@@ -2678,7 +2693,7 @@ where
 #[cfg_attr(not(test), rustc_diagnostic_item = "ToString")]
 #[stable(feature = "rust1", since = "1.0.0")]
 #[allow(unused_braces)]
-pub trait ToString<const COOP_PREFERRED: bool = {DEFAULT_COOP_PREFERRED!()}>
+pub trait ToString<const COOP_PREFERRED: bool = { DEFAULT_COOP_PREFERRED!() }>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
@@ -2921,7 +2936,8 @@ where
 #[cfg(not(test))]
 #[stable(feature = "string_from_box", since = "1.18.0")]
 impl<const COOP_PREFERRED: bool> From<Box<str>> for String<COOP_PREFERRED>
-where     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     /// Converts the given boxed `str` slice to a [`String`].
     /// It is notable that the `str` slice is owned.
@@ -3045,7 +3061,8 @@ where
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "cow_from_string_ref", since = "1.28.0")]
-impl<'a, const COOP_PREFERRED: bool> From<&'a String<COOP_PREFERRED>> for Cow<'a, str, COOP_PREFERRED>
+impl<'a, const COOP_PREFERRED: bool> From<&'a String<COOP_PREFERRED>>
+    for Cow<'a, str, COOP_PREFERRED>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
@@ -3092,11 +3109,14 @@ where
 
 #[cfg(not(no_global_oom_handling))]
 #[stable(feature = "cow_str_from_iter", since = "1.12.0")]
-impl<'a, const COOP_PREFERRED: bool> FromIterator<String<COOP_PREFERRED>> for Cow<'a, str, COOP_PREFERRED>
+impl<'a, const COOP_PREFERRED: bool> FromIterator<String<COOP_PREFERRED>>
+    for Cow<'a, str, COOP_PREFERRED>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
-    fn from_iter<I: IntoIterator<Item = String<COOP_PREFERRED>>>(it: I) -> Cow<'a, str, COOP_PREFERRED> {
+    fn from_iter<I: IntoIterator<Item = String<COOP_PREFERRED>>>(
+        it: I,
+    ) -> Cow<'a, str, COOP_PREFERRED> {
         Cow::Owned(FromIterator::from_iter(it))
     }
 }
@@ -3153,7 +3173,7 @@ where
 #[stable(feature = "drain", since = "1.6.0")]
 #[allow(unused_braces)]
 // @FIXME Do we need to use DEFAULT_COOP_PREFERRED here?
-pub struct Drain<'a, const COOP_PREFERRED: bool = {DEFAULT_COOP_PREFERRED!()}>
+pub struct Drain<'a, const COOP_PREFERRED: bool = { DEFAULT_COOP_PREFERRED!() }>
 where
     [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
@@ -3183,10 +3203,10 @@ unsafe impl<const COOP_PREFERRED: bool> Sync for Drain<'_, COOP_PREFERRED> where
 {
 }
 #[stable(feature = "drain", since = "1.6.0")]
-unsafe impl<const COOP_PREFERRED: bool> Send for Drain<'_, COOP_PREFERRED>
-where
-    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
-{}
+unsafe impl<const COOP_PREFERRED: bool> Send for Drain<'_, COOP_PREFERRED> where
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:
+{
+}
 
 #[stable(feature = "drain", since = "1.6.0")]
 impl<const COOP_PREFERRED: bool> Drop for Drain<'_, COOP_PREFERRED>

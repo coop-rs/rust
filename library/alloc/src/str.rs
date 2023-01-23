@@ -516,7 +516,7 @@ impl str {
     #[inline]
     pub fn into_string<const COOP_PREFERRED: bool>(self: Box<str>) -> String<COOP_PREFERRED>
     where
-    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
+        [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
     {
         let slice = Box::<[u8]>::from(self);
         unsafe { String::from_utf8_unchecked(slice.into_vec()) }
