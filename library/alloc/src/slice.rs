@@ -838,9 +838,7 @@ where
 #[stable(feature = "rust1", since = "1.0.0")]
 impl<T: Clone, const COOP_PREFERRED: bool> ToOwned<COOP_PREFERRED> for [T]
 where
-[(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(
-    COOP_PREFERRED,
-)]:,
+    [(); core::alloc::co_alloc_metadata_num_slots_with_preference::<Global>(COOP_PREFERRED)]:,
 {
     type Owned = Vec<T, Global, COOP_PREFERRED>;
     #[cfg(not(test))]
