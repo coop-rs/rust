@@ -88,6 +88,7 @@
 #![warn(deprecated_in_future)]
 #![warn(missing_debug_implementations)]
 #![warn(missing_docs)]
+#![allow(incomplete_features)]
 #![allow(explicit_outlives_requirements)]
 #![warn(multiple_supertrait_upcastable)]
 #![allow(internal_features)]
@@ -129,6 +130,7 @@
 #![feature(extend_one)]
 #![feature(fmt_internals)]
 #![feature(fn_traits)]
+#![feature(global_co_alloc_meta)]
 #![feature(hasher_prefixfree_extras)]
 #![feature(inline_const)]
 #![feature(inplace_iteration)]
@@ -173,6 +175,7 @@
 #![feature(allocator_internals)]
 #![feature(allow_internal_unstable)]
 #![feature(associated_type_bounds)]
+#![feature(associated_type_defaults)]
 #![feature(c_unwind)]
 #![feature(cfg_sanitize)]
 #![feature(const_mut_refs)]
@@ -183,8 +186,10 @@
 #![feature(dropck_eyepatch)]
 #![feature(exclusive_range_pattern)]
 #![feature(fundamental)]
+#![feature(global_co_alloc)]
 #![feature(hashmap_internals)]
 #![feature(lang_items)]
+#![feature(global_co_alloc_default)]
 #![feature(min_specialization)]
 #![feature(multiple_supertrait_upcastable)]
 #![feature(negative_impls)]
@@ -240,6 +245,9 @@ mod boxed {
     pub use std::boxed::Box;
 }
 pub mod borrow;
+#[macro_use]
+#[unstable(feature = "global_co_alloc", issue = "none")]
+pub mod co_alloc;
 pub mod collections;
 #[cfg(all(not(no_rc), not(no_sync), not(no_global_oom_handling)))]
 pub mod ffi;

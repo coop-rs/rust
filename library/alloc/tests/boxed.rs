@@ -61,6 +61,7 @@ fn box_deref_lval() {
 
 pub struct ConstAllocator;
 
+// @TODO CoAlloc: Had: unsafe impl const
 unsafe impl Allocator for ConstAllocator {
     fn allocate(&self, layout: Layout) -> Result<NonNull<[u8]>, AllocError> {
         match layout.size() {

@@ -17,6 +17,9 @@
 #![feature(dropck_eyepatch)]
 #![feature(new_uninit)]
 #![feature(maybe_uninit_slice)]
+//#![feature(min_specialization)]
+// TODO CoAlloc specialization!
+#![feature(specialization)]
 #![feature(decl_macro)]
 #![feature(rustc_attrs)]
 #![cfg_attr(test, feature(test))]

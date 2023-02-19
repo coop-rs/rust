@@ -111,7 +111,9 @@
 //
 // Library features:
 // tidy-alphabetical-start
+#![feature(associated_type_defaults)]
 #![feature(char_indices_offset)]
+// TODO CoAlloc: ? #![feature(const_align_offset)]
 #![feature(const_align_of_val)]
 #![feature(const_align_of_val_raw)]
 #![feature(const_align_offset)]

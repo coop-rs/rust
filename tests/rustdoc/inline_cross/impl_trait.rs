@@ -4,8 +4,9 @@
 extern crate impl_trait_aux;
 
 // @has impl_trait/fn.func.html
-// @has - '//pre[@class="rust item-decl"]' "pub fn func<'a>(_x: impl Clone + Into<Vec<u8>> + 'a)"
+// @has - '//pre[@class="rust item-decl"]' "pub fn func<'a>(_x: impl Clone + Into<Vec<u8, Global, 0>> + 'a)"
 // @!has - '//pre[@class="rust item-decl"]' 'where'
+// FIXME: This depends on co-allocation default being NO/ZERO META.
 pub use impl_trait_aux::func;
 
 // @has impl_trait/fn.func2.html
@@ -34,6 +35,7 @@ pub use impl_trait_aux::func4;
 pub use impl_trait_aux::func5;
 
 // @has impl_trait/struct.Foo.html
-// @has - '//*[@id="method.method"]//h4[@class="code-header"]' "pub fn method<'a>(_x: impl Clone + Into<Vec<u8>> + 'a)"
+// @has - '//*[@id="method.method"]//h4[@class="code-header"]' "pub fn method<'a>(_x: impl Clone + Into<Vec<u8, Global, 0>> + 'a)"
 // @!has - '//*[@id="method.method"]//h4[@class="code-header"]' 'where'
+// FIXME: This depends on co-allocation default being NO/ZERO META.
 pub use impl_trait_aux::Foo;
