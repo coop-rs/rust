@@ -3,6 +3,7 @@
 // ignore-debug MIR alignment checks in std alter the diff, breaking the test
 // compile-flags: -Zmir-opt-level=4 -Zinline-mir-hint-threshold=200
 
+// EMIT_MIR_FOR_EACH_BIT_WIDTH
 // EMIT_MIR inline_into_box_place.main.Inline.diff
 fn main() {
     // CHECK-LABEL: fn main(

@@ -5,10 +5,11 @@
 // The this solution works like the implementation of macOS and
 // doesn't additional OS support
 
+use alloc::vec::PlVec;
 use crate::cell::RefCell;
 
 #[thread_local]
-static DTORS: RefCell<Vec<(*mut u8, unsafe extern "C" fn(*mut u8))>> = RefCell::new(Vec::new());
+static DTORS: RefCell<PlVec<(*mut u8, unsafe extern "C" fn(*mut u8))>> = RefCell::new(PlVec::new());
 
 pub unsafe fn register_dtor(t: *mut u8, dtor: unsafe extern "C" fn(*mut u8)) {
     match DTORS.try_borrow_mut() {

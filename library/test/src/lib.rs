@@ -18,6 +18,9 @@
 #![doc(test(attr(deny(warnings))))]
 #![cfg_attr(not(bootstrap), doc(rust_logo))]
 #![cfg_attr(not(bootstrap), feature(rustdoc_internals))]
+#![feature(allocator_api)]
+#![feature(global_co_alloc)]
+#![feature(global_co_alloc_meta)]
 #![feature(internal_output_capture)]
 #![feature(staged_api)]
 #![feature(process_exitcode_internals)]
@@ -54,6 +57,7 @@ pub mod test {
 }
 
 use std::{
+    alloc::Global,
     collections::VecDeque,
     env, io,
     io::prelude::Write,
@@ -352,7 +356,8 @@ where
     };
 
     let mut running_tests: TestMap = HashMap::default();
-    let mut timeout_queue: VecDeque<TimeoutEntry> = VecDeque::new();
+    // @FIXME See if we can remove `Global` generic param:
+    let mut timeout_queue: VecDeque<TimeoutEntry, Global> = VecDeque::new();
 
     fn get_timed_out_tests(
         running_tests: &TestMap,

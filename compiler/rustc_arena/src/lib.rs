@@ -11,12 +11,16 @@
     html_root_url = "https://doc.rust-lang.org/nightly/nightly-rustc/",
     test(no_crate_inject, attr(deny(warnings)))
 )]
+#![allow(incomplete_features)]
 #![cfg_attr(not(bootstrap), doc(rust_logo))]
 #![cfg_attr(not(bootstrap), feature(rustdoc_internals))]
 #![feature(core_intrinsics)]
 #![feature(dropck_eyepatch)]
 #![feature(new_uninit)]
 #![feature(maybe_uninit_slice)]
+//#![feature(min_specialization)]
+// TODO CoAlloc specialization!
+#![feature(specialization)]
 #![feature(decl_macro)]
 #![feature(rustc_attrs)]
 #![cfg_attr(test, feature(test))]
