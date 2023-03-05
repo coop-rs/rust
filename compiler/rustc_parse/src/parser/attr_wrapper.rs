@@ -1,5 +1,4 @@
 use super::{Capturing, FlatToken, ForceCollect, Parser, ReplaceRange, TokenCursor, TrailingToken};
-use core::mem;
 use rustc_ast::token::{self, Delimiter, Token, TokenKind};
 use rustc_ast::tokenstream::{AttrTokenStream, AttributesData, ToAttrTokenStream};
 use rustc_ast::tokenstream::{AttrTokenTree, DelimSpan, LazyAttrTokenStream, Spacing};
@@ -9,7 +8,6 @@ use rustc_errors::PResult;
 use rustc_session::parse::ParseSess;
 use rustc_span::{sym, Span, DUMMY_SP};
 
-use std::alloc::{Allocator, Global};
 use std::ops::Range;
 
 /// A wrapper type to ensure that the parser handles outer attributes correctly.
@@ -469,11 +467,12 @@ fn make_token_stream(
 mod size_asserts {
     use super::*;
     use rustc_data_structures::static_assert_size;
+    use std::alloc::{Allocator, Global};
     // tidy-alphabetical-start
     static_assert_size!(AttrWrapper, 16);
     static_assert_size!(
         LazyAttrTokenStreamImpl,
-        120 + mem::size_of::<<Global as Allocator>::CoAllocMeta>()
+        120 + std::mem::size_of::<<Global as Allocator>::CoAllocMeta>()
     );
     // tidy-alphabetical-end
 }

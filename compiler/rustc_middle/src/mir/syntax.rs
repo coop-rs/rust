@@ -4,7 +4,6 @@
 //! The intention is that this file only contains datatype declarations, no code.
 
 use super::{BasicBlock, Constant, Field, Local, SwitchTargets, UserTypeProjection};
-use core::mem;
 
 use crate::mir::coverage::{CodeRegion, CoverageKind};
 use crate::traits::Reveal;
@@ -24,8 +23,6 @@ use rustc_span::def_id::LocalDefId;
 use rustc_span::symbol::Symbol;
 use rustc_span::Span;
 use rustc_target::asm::InlineAsmRegOrRegClass;
-
-use std::alloc::{Allocator, Global};
 
 /// Represents the "flavors" of MIR.
 ///
@@ -1254,6 +1251,9 @@ mod size_asserts {
     static_assert_size!(Operand<'_>, 24);
     static_assert_size!(Place<'_>, 16);
     static_assert_size!(PlaceElem<'_>, 24);
-    static_assert_size!(Rvalue<'_>, 40 + mem::size_of::<<Global as Allocator>::CoAllocMeta>());
+    static_assert_size!(
+        Rvalue<'_>,
+        40 + std::mem::size_of::<<std::alloc::Global as std::alloc::Allocator>::CoAllocMeta>()
+    );
     // tidy-alphabetical-end
 }

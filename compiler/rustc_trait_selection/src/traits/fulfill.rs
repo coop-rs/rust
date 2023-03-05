@@ -1,5 +1,4 @@
 use crate::infer::{InferCtxt, TyOrConstInferVar};
-use core::mem;
 // use rustc_data_structures::fx::FxHashMap;
 use rustc_data_structures::obligation_forest::ProcessResult;
 use rustc_data_structures::obligation_forest::{Error, ForestObligation, Outcome};
@@ -12,7 +11,6 @@ use rustc_middle::ty::abstract_const::NotConstEvaluatable;
 use rustc_middle::ty::error::{ExpectedFound, TypeError};
 use rustc_middle::ty::subst::SubstsRef;
 use rustc_middle::ty::{self, Binder, Const, TypeVisitableExt};
-use std::alloc::{Allocator, Global};
 use std::marker::PhantomData;
 
 use super::const_evaluatable;
@@ -83,7 +81,7 @@ pub struct PendingPredicateObligation<'tcx> {
 #[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
 static_assert_size!(
     PendingPredicateObligation<'_>,
-    72 + mem::size_of::<<Global as Allocator>::CoAllocMeta>()
+    72 + std::mem::size_of::<<std::alloc::Global as std::alloc::Allocator>::CoAllocMeta>()
 );
 
 impl<'a, 'tcx> FulfillmentContext<'tcx> {

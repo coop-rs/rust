@@ -34,7 +34,6 @@ use rustc_span::{Span, DUMMY_SP};
 
 use either::Either;
 
-use std::alloc::{Allocator, Global};
 use std::borrow::Cow;
 use std::fmt::{self, Debug, Display, Formatter, Write};
 use std::ops::{ControlFlow, Index, IndexMut};
@@ -3084,7 +3083,7 @@ mod size_asserts {
     // tidy-alphabetical-start
     static_assert_size!(
         BasicBlockData<'_>,
-        144 + mem::size_of::<<Global as Allocator>::CoAllocMeta>()
+        144 + mem::size_of::<<std::alloc::Global as std::alloc::Allocator>::CoAllocMeta>()
     );
     static_assert_size!(LocalDecl<'_>, 40);
     static_assert_size!(Statement<'_>, 32);

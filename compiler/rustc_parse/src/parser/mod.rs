@@ -36,7 +36,6 @@ use rustc_errors::{
 use rustc_session::parse::ParseSess;
 use rustc_span::source_map::{Span, DUMMY_SP};
 use rustc_span::symbol::{kw, sym, Ident, Symbol};
-use std::alloc::{Allocator, Global};
 use std::ops::Range;
 use std::{cmp, mem, slice};
 use thin_vec::ThinVec;
@@ -168,7 +167,7 @@ pub struct Parser<'a> {
 #[cfg(all(target_arch = "x86_64", target_pointer_width = "64"))]
 rustc_data_structures::static_assert_size!(
     Parser<'_>,
-    288 + 4 * mem::size_of::<<Global as Allocator>::CoAllocMeta>()
+    288 + 4 * mem::size_of::<<std::alloc::Global as std::alloc::Allocator>::CoAllocMeta>()
 );
 
 /// Stores span information about a closure.

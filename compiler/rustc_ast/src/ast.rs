@@ -34,8 +34,6 @@ use rustc_serialize::{Decodable, Decoder, Encodable, Encoder};
 use rustc_span::source_map::{respan, Spanned};
 use rustc_span::symbol::{kw, sym, Ident, Symbol};
 use rustc_span::{Span, DUMMY_SP};
-use std::alloc::Allocator;
-use std::alloc::Global;
 use std::fmt;
 use std::mem;
 use thin_vec::{thin_vec, ThinVec};
@@ -3114,6 +3112,7 @@ pub type ForeignItem = Item<ForeignItemKind>;
 mod size_asserts {
     use super::*;
     use rustc_data_structures::static_assert_size;
+    use std::alloc::{Allocator, Global};
     // tidy-alphabetical-start
     static_assert_size!(AssocItem, 104);
     static_assert_size!(AssocItemKind, 32);

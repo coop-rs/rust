@@ -80,7 +80,7 @@ struct LeafNode<K, V> {
 }
 
 /// @FIXME Remove once we remove leaf_node_capacity!() workaround for https://github.com/rust-lang/rust/issues/108751
-#[test]
+/// This should be in #[test], but that would mean having it in a separate file (as per `x test tidy --bless`) - too complicated for this workaround.
 #[allow(dead_code)]
 fn assert_leaf_node_capacity() {
     fn leaf_node() -> LeafNode<char, bool> {
@@ -130,7 +130,7 @@ struct InternalNode<K, V> {
 }
 
 /// @FIXME Remove once we remove internal_node_capacity!() workaround for https://github.com/rust-lang/rust/issues/108751
-#[test]
+/// This should be in #[test], but that would mean having it in a separate file (as per `x test tidy --bless`) - too complicated for this workaround.
 #[allow(dead_code)]
 fn assert_internal_node_capacity() {
     fn internal_node() -> InternalNode<char, bool> {

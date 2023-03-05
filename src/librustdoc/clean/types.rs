@@ -1,8 +1,6 @@
-use std::alloc::GlobalCoAllocMeta;
 use std::cell::RefCell;
 use std::default::Default;
 use std::hash::Hash;
-use std::mem;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -2399,16 +2397,19 @@ impl SubstParam {
 mod size_asserts {
     use super::*;
     use rustc_data_structures::static_assert_size;
+    #[allow(dead_code)]
+    const GLOBAL_CO_ALLOC_META_SIZE: usize =
+        std::mem::size_of::<<std::alloc::Global as std::alloc::Allocator>::CoAllocMeta>();
     // tidy-alphabetical-start
     static_assert_size!(Crate, 64); // frequently moved by-value
     static_assert_size!(DocFragment, 32);
-    static_assert_size!(GenericArg, 32 + mem::size_of::<GlobalCoAllocMeta>());
+    static_assert_size!(GenericArg, 32 + GLOBAL_CO_ALLOC_META_SIZE);
     static_assert_size!(GenericArgs, 32);
-    static_assert_size!(GenericParamDef, 56 + mem::size_of::<GlobalCoAllocMeta>());
+    static_assert_size!(GenericParamDef, 56 + GLOBAL_CO_ALLOC_META_SIZE);
     static_assert_size!(Generics, 16);
     static_assert_size!(Item, 56);
-    static_assert_size!(ItemKind, 64 + mem::size_of::<GlobalCoAllocMeta>());
+    static_assert_size!(ItemKind, 64 + GLOBAL_CO_ALLOC_META_SIZE);
     static_assert_size!(PathSegment, 40);
-    static_assert_size!(Type, 32 + mem::size_of::<GlobalCoAllocMeta>());
+    static_assert_size!(Type, 32 + GLOBAL_CO_ALLOC_META_SIZE);
     // tidy-alphabetical-end
 }

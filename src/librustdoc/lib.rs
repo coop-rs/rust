@@ -2,6 +2,7 @@
     html_root_url = "https://doc.rust-lang.org/nightly/",
     html_playground_url = "https://play.rust-lang.org/"
 )]
+#![feature(allocator_api)]
 #![feature(rustc_private)]
 #![feature(array_methods)]
 #![feature(assert_matches)]
