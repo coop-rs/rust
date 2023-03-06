@@ -57,37 +57,27 @@ where
 }
 
 // Until we can use feature `specialization`:
-// TODO macro
-impl<T>
-    SpecFromIterCo<T, crate::vec::IntoIter<T, Global, 0>>
-    for VecDeque<T, Global, 0>
-{
+// FIXME macro
+impl<T> SpecFromIterCo<T, crate::vec::IntoIter<T, Global, 0>> for VecDeque<T, Global, 0> {
     #[inline]
     fn spec_from_iter_co(iterator: crate::vec::IntoIter<T, Global, 0>) -> Self {
         iterator.into_vecdeque()
     }
 }
-impl<T>
-    SpecFromIterCo<T, crate::vec::IntoIter<T, Global, 1>>
-    for VecDeque<T, Global, 1>
-{
+impl<T> SpecFromIterCo<T, crate::vec::IntoIter<T, Global, 1>> for VecDeque<T, Global, 1> {
     #[inline]
     fn spec_from_iter_co(iterator: crate::vec::IntoIter<T, Global, 1>) -> Self {
         iterator.into_vecdeque()
     }
 }
 
-impl<T> SpecFromIterCo<T, IntoIter<T, Global, 0>>
-    for VecDeque<T, Global, 0>
-{
+impl<T> SpecFromIterCo<T, IntoIter<T, Global, 0>> for VecDeque<T, Global, 0> {
     #[inline]
     fn spec_from_iter_co(iterator: IntoIter<T, Global, 0>) -> Self {
         iterator.into_vecdeque()
     }
 }
-impl<T> SpecFromIterCo<T, IntoIter<T, Global, 1>>
-    for VecDeque<T, Global, 1>
-{
+impl<T> SpecFromIterCo<T, IntoIter<T, Global, 1>> for VecDeque<T, Global, 1> {
     #[inline]
     fn spec_from_iter_co(iterator: IntoIter<T, Global, 1>) -> Self {
         iterator.into_vecdeque()
