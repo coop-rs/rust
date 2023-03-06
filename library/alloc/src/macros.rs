@@ -127,7 +127,14 @@ macro_rules! __rust_force_expr {
     };
 }
 
-// ----- CoAlloc ICE workaround macro:
+// ----- CoAlloc ICE workaround macro
+//
+// Most of the following code is workaround until we have `generic_const_exprs`. Upvote
+// `https://github.com/rust-lang/rust/issues/76560, please.
+//
+// However, those (commented out) workarounds will compile only once
+// https://github.com/rust-lang/rust/issues/106994 (the ICE) is fixed first. Upvote it, too, please.
+
 /// This "validates" type of a given `const` expression, and it casts it. That helps to prevent mix ups with macros/integer constant values.
 #[doc(hidden)]
 #[macro_export]

@@ -38,7 +38,7 @@ impl<T> SpecFromIter<T, IntoIter<T>> for VecDeque<T> {
         iterator.into_vecdeque()
     }
 }
-// ----
+// ---- CoAllocation:
 
 #[allow(unused_braces)]
 impl<T, I, const CO_ALLOC_PREF: CoAllocPref> SpecFromIterCo<T, I>
@@ -48,6 +48,14 @@ where
     [(); { crate::meta_num_slots_global!(CO_ALLOC_PREF) }]:,
 {
     default fn spec_from_iter_co(iterator: I) -> Self {
+        // @FIXME Move the assert to library/alloc/src/macros.rs -> co_alloc_pref!(...) and replace
+        // calls to CO_ALLOC_PREF_META_YES and CO_ALLOC_PREF_META_NO with constants - once
+        // https://github.com/rust-lang/rust/issues/106994 (the ICE) is fixed. Upvote it, please.
+        core::debug_assert!(
+            CO_ALLOC_PREF == crate::CO_ALLOC_PREF_META_YES!()
+                || CO_ALLOC_PREF == crate::CO_ALLOC_PREF_META_NO!(),
+            "CO_ALLOC_PREF must equal to CO_ALLOC_PREF_META_YES!() or CO_ALLOC_PREF_META_NO!(), but it is: {CO_ALLOC_PREF}."
+        );
         // Since converting is O(1) now, just re-use the `Vec` logic for
         // anything where we can't do something extra-special for `VecDeque`,
         // especially as that could save us some monomorphiziation work
@@ -57,7 +65,7 @@ where
 }
 
 // Until we can use feature `specialization`:
-// FIXME macro
+// @FIXME new macro + replace 0 and 1 with META ZERO/ONE
 impl<T> SpecFromIterCo<T, crate::vec::IntoIter<T, Global, 0>> for VecDeque<T, Global, 0> {
     #[inline]
     fn spec_from_iter_co(iterator: crate::vec::IntoIter<T, Global, 0>) -> Self {
