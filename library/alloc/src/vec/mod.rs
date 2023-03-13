@@ -3160,7 +3160,7 @@ where
     where
         R: RangeBounds<usize>,
         I: IntoIterator<Item = T>,
-        [(); { crate::meta_num_slots!(A, crate::CO_ALLOC_PREF_META_YES!()) }]:,
+        [(); CO_ALLOC_PREF]:,
     {
         Splice { drain: self.drain(range), replace_with: replace_with.into_iter() }
     }

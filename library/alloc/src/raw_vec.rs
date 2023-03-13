@@ -126,9 +126,10 @@ impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> RawVec<T, A, CO_ALLOC_PR
 where
     [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
 {
+    // @FIXME
     #[allow(dead_code)]
     const fn new_plain_metas() -> [A::CoAllocMeta; { meta_num_slots_default!(A) }] {
-        loop {}
+        panic!("FIXME")
     }
 
     // Tiny Vecs are dumb. Skip to:

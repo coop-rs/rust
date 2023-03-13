@@ -79,18 +79,6 @@ struct LeafNode<K, V> {
     vals: [MaybeUninit<V>; leaf_node_capacity!()],
 }
 
-/// @FIXME Remove once we remove leaf_node_capacity!() workaround for https://github.com/rust-lang/rust/issues/108751
-/// This should be in #[test], but that would mean having it in a separate file (as per `x test tidy --bless`) - too complicated for this workaround.
-#[allow(dead_code)]
-fn assert_leaf_node_capacity() {
-    fn leaf_node() -> LeafNode<char, bool> {
-        loop {}
-    }
-    let node = leaf_node();
-    let _keys: [MaybeUninit<char>; CAPACITY] = node.keys;
-    let _vals: [MaybeUninit<bool>; CAPACITY] = node.vals;
-}
-
 impl<K, V> LeafNode<K, V> {
     /// Initializes a new `LeafNode` in-place.
     unsafe fn init(this: *mut Self) {
@@ -127,17 +115,6 @@ struct InternalNode<K, V> {
     /// initialized and valid, except that near the end, while the tree is held
     /// through borrow type `Dying`, some of these pointers are dangling.
     edges: [MaybeUninit<BoxedNode<K, V>>; internal_node_capacity!()], // @FIXME internal_node_capacity!() workaround for https://github.com/rust-lang/rust/issues/108751
-}
-
-/// @FIXME Remove once we remove internal_node_capacity!() workaround for https://github.com/rust-lang/rust/issues/108751
-/// This should be in #[test], but that would mean having it in a separate file (as per `x test tidy --bless`) - too complicated for this workaround.
-#[allow(dead_code)]
-fn assert_internal_node_capacity() {
-    fn internal_node() -> InternalNode<char, bool> {
-        loop {}
-    }
-    let node = internal_node();
-    let _edges: [MaybeUninit<BoxedNode<char, bool>>; 2 * B] = node.edges;
 }
 
 impl<K, V> InternalNode<K, V> {

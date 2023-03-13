@@ -6,7 +6,8 @@
 
 //use std::alloc::{Allocator, System};
 
-// PK: nowhere else under rust source, only here:
+// @FIXME
+// peter-kehl: nowhere else under rust source, only here:
 //fn ensure_object_safe(_: &dyn Allocator) {}
 
 fn main() {
