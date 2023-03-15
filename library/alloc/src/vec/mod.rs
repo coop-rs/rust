@@ -511,6 +511,74 @@ impl<T> Vec<T> {
 // Inherent methods
 ////////////////////////////////////////////////////////////////////////////////
 
+#[allow(unused_braces)]
+impl<T, A: Allocator> Vec<T, A>
+where
+    [(); { meta_num_slots_default!(A) }]:,
+{
+    /// Constructs a new, empty `Vec<T, A>` with at least the specified capacity
+    /// with the provided allocator.
+    ///
+    /// The vector will be able to hold at least `capacity` elements without
+    /// reallocating. This method is allowed to allocate for more elements than
+    /// `capacity`. If `capacity` is 0, the vector will not allocate.
+    ///
+    /// It is important to note that although the returned vector has the
+    /// minimum *capacity* specified, the vector will have a zero *length*. For
+    /// an explanation of the difference between length and capacity, see
+    /// *[Capacity and reallocation]*.
+    ///
+    /// If it is important to know the exact allocated capacity of a `Vec`,
+    /// always use the [`capacity`] method after construction.
+    ///
+    /// For `Vec<T, A>` where `T` is a zero-sized type, there will be no allocation
+    /// and the capacity will always be `usize::MAX`.
+    ///
+    /// [Capacity and reallocation]: #capacity-and-reallocation
+    /// [`capacity`]: Vec::capacity
+    ///
+    /// # Panics
+    ///
+    /// Panics if the new capacity exceeds `isize::MAX` bytes.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// #![feature(allocator_api)]
+    ///
+    /// use std::alloc::System;
+    ///
+    /// let mut vec = Vec::with_capacity_in(10, System);
+    ///
+    /// // The vector contains no items, even though it has capacity for more
+    /// assert_eq!(vec.len(), 0);
+    /// assert_eq!(vec.capacity(), 10);
+    ///
+    /// // These are all done without reallocating...
+    /// for i in 0..10 {
+    ///     vec.push(i);
+    /// }
+    /// assert_eq!(vec.len(), 10);
+    /// assert_eq!(vec.capacity(), 10);
+    ///
+    /// // ...but this may make the vector reallocate
+    /// vec.push(11);
+    /// assert_eq!(vec.len(), 11);
+    /// assert!(vec.capacity() >= 11);
+    ///
+    /// // A vector of a zero-sized type will always over-allocate, since no
+    /// // allocation is necessary
+    /// let vec_units = Vec::<(), System>::with_capacity_in(10, System);
+    /// assert_eq!(vec_units.capacity(), usize::MAX);
+    /// ```
+    #[cfg(not(no_global_oom_handling))]
+    #[inline]
+    #[unstable(feature = "allocator_api", issue = "32838")]
+    pub fn with_capacity_in(capacity: usize, alloc: A) -> Self {
+        Self::with_capacity_in_co(capacity, alloc)
+    }
+}
+
 /**/
 #[allow(unused_braces)]
 impl<T, const CO_ALLOC_PREF: CoAllocPref> Vec<T, Global, CO_ALLOC_PREF>
@@ -582,7 +650,7 @@ where
     #[unstable(feature = "vec_new_co", reason = "confirm_or_fix_the_function_name", issue = "none")]
     #[must_use]
     pub fn with_capacity_co(capacity: usize) -> Self {
-        Self::with_capacity_in(capacity, Global)
+        Self::with_capacity_in_co(capacity, Global)
     }
 
     /// Coallocation-aware alternative to `from_row_parts`.
@@ -729,65 +797,11 @@ where
         Vec { buf: RawVec::new_in(alloc), len: 0 }
     }
 
-    /// Constructs a new, empty `Vec<T, A>` with at least the specified capacity
-    /// with the provided allocator.
-    ///
-    /// The vector will be able to hold at least `capacity` elements without
-    /// reallocating. This method is allowed to allocate for more elements than
-    /// `capacity`. If `capacity` is 0, the vector will not allocate.
-    ///
-    /// It is important to note that although the returned vector has the
-    /// minimum *capacity* specified, the vector will have a zero *length*. For
-    /// an explanation of the difference between length and capacity, see
-    /// *[Capacity and reallocation]*.
-    ///
-    /// If it is important to know the exact allocated capacity of a `Vec`,
-    /// always use the [`capacity`] method after construction.
-    ///
-    /// For `Vec<T, A>` where `T` is a zero-sized type, there will be no allocation
-    /// and the capacity will always be `usize::MAX`.
-    ///
-    /// [Capacity and reallocation]: #capacity-and-reallocation
-    /// [`capacity`]: Vec::capacity
-    ///
-    /// # Panics
-    ///
-    /// Panics if the new capacity exceeds `isize::MAX` bytes.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(allocator_api)]
-    ///
-    /// use std::alloc::System;
-    ///
-    /// let mut vec = Vec::with_capacity_in(10, System);
-    ///
-    /// // The vector contains no items, even though it has capacity for more
-    /// assert_eq!(vec.len(), 0);
-    /// assert_eq!(vec.capacity(), 10);
-    ///
-    /// // These are all done without reallocating...
-    /// for i in 0..10 {
-    ///     vec.push(i);
-    /// }
-    /// assert_eq!(vec.len(), 10);
-    /// assert_eq!(vec.capacity(), 10);
-    ///
-    /// // ...but this may make the vector reallocate
-    /// vec.push(11);
-    /// assert_eq!(vec.len(), 11);
-    /// assert!(vec.capacity() >= 11);
-    ///
-    /// // A vector of a zero-sized type will always over-allocate, since no
-    /// // allocation is necessary
-    /// let vec_units = Vec::<(), System>::with_capacity_in(10, System);
-    /// assert_eq!(vec_units.capacity(), usize::MAX);
-    /// ```
+    /** Like `with_capacity_in`, but co-allocation-aware. */
     #[cfg(not(no_global_oom_handling))]
     #[inline]
-    #[unstable(feature = "allocator_api", issue = "32838")]
-    pub fn with_capacity_in(capacity: usize, alloc: A) -> Self {
+    #[unstable(feature = "global_co_alloc", issue = "none")]
+    pub fn with_capacity_in_co(capacity: usize, alloc: A) -> Self {
         Vec { buf: RawVec::with_capacity_in(capacity, alloc), len: 0 }
     }
 
@@ -2260,12 +2274,12 @@ where
             // the new vector can take over the original buffer and avoid the copy
             return mem::replace(
                 self,
-                Vec::with_capacity_in(self.capacity(), self.allocator().clone()),
+                Vec::with_capacity_in_co(self.capacity(), self.allocator().clone()),
             );
         }
 
         let other_len = self.len - at;
-        let mut other = Vec::with_capacity_in(other_len, self.allocator().clone());
+        let mut other = Vec::with_capacity_in_co(other_len, self.allocator().clone());
 
         // Unsafely `set_len` and copy items to `other`.
         unsafe {

@@ -270,7 +270,7 @@ pub(crate) mod hack {
                     }
                 }
             }
-            let mut vec = Vec::with_capacity_in(s.len(), alloc);
+            let mut vec = Vec::with_capacity_in_co(s.len(), alloc);
             let mut guard = DropGuard { vec: &mut vec, num_init: 0 };
             let slots = guard.vec.spare_capacity_mut();
             // .take(slots.len()) is necessary for LLVM to remove bounds checks
@@ -300,7 +300,7 @@ pub(crate) mod hack {
         where
             [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
         {
-            let mut v = Vec::with_capacity_in(s.len(), alloc);
+            let mut v = Vec::with_capacity_in_co(s.len(), alloc);
             // SAFETY:
             // allocated above with the capacity of `s`, and initialize to `s.len()` in
             // ptr::copy_to_non_overlapping below.

@@ -28,7 +28,7 @@ impl<T: Clone> SpecFromElem for T {
     where
         [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
     {
-        let mut v = Vec::with_capacity_in(n, alloc);
+        let mut v = Vec::with_capacity_in_co(n, alloc);
         v.extend_with(n, ExtendElement(elem));
         v
     }
@@ -48,7 +48,7 @@ impl<T: Clone + IsZero> SpecFromElem for T {
         if elem.is_zero() {
             return Vec { buf: RawVec::with_capacity_zeroed_in(n, alloc), len: n };
         }
-        let mut v = Vec::with_capacity_in(n, alloc);
+        let mut v = Vec::with_capacity_in_co(n, alloc);
         v.extend_with(n, ExtendElement(elem));
         v
     }
@@ -69,7 +69,7 @@ impl SpecFromElem for i8 {
             return Vec { buf: RawVec::with_capacity_zeroed_in(n, alloc), len: n };
         }
         unsafe {
-            let mut v = Vec::with_capacity_in(n, alloc);
+            let mut v = Vec::with_capacity_in_co(n, alloc);
             ptr::write_bytes(v.as_mut_ptr(), elem as u8, n);
             v.set_len(n);
             v
@@ -92,7 +92,7 @@ impl SpecFromElem for u8 {
             return Vec { buf: RawVec::with_capacity_zeroed_in(n, alloc), len: n };
         }
         unsafe {
-            let mut v = Vec::with_capacity_in(n, alloc);
+            let mut v = Vec::with_capacity_in_co(n, alloc);
             ptr::write_bytes(v.as_mut_ptr(), elem, n);
             v.set_len(n);
             v
