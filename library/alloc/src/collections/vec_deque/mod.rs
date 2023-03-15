@@ -3042,11 +3042,10 @@ where
 
 #[stable(feature = "vecdeque_vec_conversions", since = "1.10.0")]
 #[allow(unused_braces)]
-impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref, const VECDEQUE_CO_ALLOC_PREF: CoAllocPref>
-    From<VecDeque<T, A, VECDEQUE_CO_ALLOC_PREF>> for Vec<T, A, CO_ALLOC_PREF>
+impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> From<VecDeque<T, A, CO_ALLOC_PREF>>
+    for Vec<T, A, CO_ALLOC_PREF>
 where
     [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
-    [(); { crate::meta_num_slots!(A, VECDEQUE_CO_ALLOC_PREF) }]:,
 {
     /// Turn a [`VecDeque<T>`] into a [`Vec<T>`].
     ///
@@ -3077,9 +3076,9 @@ where
     /// assert_eq!(vec, [8, 9, 1, 2, 3, 4]);
     /// assert_eq!(vec.as_ptr(), ptr);
     /// ```
-    fn from(mut other: VecDeque<T, A, VECDEQUE_CO_ALLOC_PREF>) -> Self
+    fn from(mut other: VecDeque<T, A, CO_ALLOC_PREF>) -> Self
     where
-        [(); { crate::meta_num_slots!(A, VECDEQUE_CO_ALLOC_PREF) }]:,
+        [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
     {
         other.make_contiguous();
 
@@ -3094,7 +3093,7 @@ where
                 ptr::copy(buf.add(other.head), buf, len);
             }
             // @FIXME: COOP
-            Vec::<T, A, CO_ALLOC_PREF>::from_raw_parts_in(buf, len, cap, alloc)
+            Vec::<T, A, CO_ALLOC_PREF>::from_raw_parts_in_co(buf, len, cap, alloc)
         }
     }
 }

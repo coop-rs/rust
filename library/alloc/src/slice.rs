@@ -120,7 +120,7 @@ pub(crate) mod hack {
         unsafe {
             let len = b.len();
             let (b, alloc) = Box::into_raw_with_allocator(b);
-            Vec::from_raw_parts_in(b as *mut T, len, len, alloc)
+            Vec::from_raw_parts_in_co(b as *mut T, len, len, alloc)
         }
     }
 

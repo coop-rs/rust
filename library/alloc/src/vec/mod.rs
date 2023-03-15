@@ -498,7 +498,7 @@ impl<T> Vec<T> {
     /// // allocation is necessary
     /// let vec_units = Vec::<()>::with_capacity(10);
     /// assert_eq!(vec_units.capacity(), usize::MAX);
-    /// ```    #[cfg(not(no_global_oom_handling))]
+    #[cfg(not(no_global_oom_handling))]
     #[inline]
     #[stable(feature = "rust1", since = "1.0.0")]
     #[must_use]
@@ -516,6 +516,26 @@ impl<T, A: Allocator> Vec<T, A>
 where
     [(); { meta_num_slots_default!(A) }]:,
 {
+    /// Constructs a new, empty `Vec<T, A>`.
+    ///
+    /// The vector will not allocate until elements are pushed onto it.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// #![feature(allocator_api)]
+    ///
+    /// use std::alloc::System;
+    ///
+    /// # #[allow(unused_mut)]
+    /// let mut vec: Vec<i32, _> = Vec::new_in(System);
+    /// ```
+    #[inline]
+    #[unstable(feature = "allocator_api", issue = "32838")]
+    pub const fn new_in(alloc: A) -> Self {
+        Self::new_in_co(alloc)
+    }
+
     /// Constructs a new, empty `Vec<T, A>` with at least the specified capacity
     /// with the provided allocator.
     ///
@@ -576,6 +596,117 @@ where
     #[unstable(feature = "allocator_api", issue = "32838")]
     pub fn with_capacity_in(capacity: usize, alloc: A) -> Self {
         Self::with_capacity_in_co(capacity, alloc)
+    }
+
+    /// Creates a `Vec<T, A>` directly from a pointer, a capacity, a length,
+    /// and an allocator.
+    ///
+    /// # Safety
+    ///
+    /// This is highly unsafe, due to the number of invariants that aren't
+    /// checked:
+    ///
+    /// * `ptr` must be [*currently allocated*] via the given allocator `alloc`.
+    /// * `T` needs to have the same alignment as what `ptr` was allocated with.
+    ///   (`T` having a less strict alignment is not sufficient, the alignment really
+    ///   needs to be equal to satisfy the [`dealloc`] requirement that memory must be
+    ///   allocated and deallocated with the same layout.)
+    /// * The size of `T` times the `capacity` (ie. the allocated size in bytes) needs
+    ///   to be the same size as the pointer was allocated with. (Because similar to
+    ///   alignment, [`dealloc`] must be called with the same layout `size`.)
+    /// * `length` needs to be less than or equal to `capacity`.
+    /// * The first `length` values must be properly initialized values of type `T`.
+    /// * `capacity` needs to [*fit*] the layout size that the pointer was allocated with.
+    /// * The allocated size in bytes must be no larger than `isize::MAX`.
+    ///   See the safety documentation of [`pointer::offset`].
+    ///
+    /// These requirements are always upheld by any `ptr` that has been allocated
+    /// via `Vec<T, A>`. Other allocation sources are allowed if the invariants are
+    /// upheld.
+    ///
+    /// Violating these may cause problems like corrupting the allocator's
+    /// internal data structures. For example it is **not** safe
+    /// to build a `Vec<u8>` from a pointer to a C `char` array with length `size_t`.
+    /// It's also not safe to build one from a `Vec<u16>` and its length, because
+    /// the allocator cares about the alignment, and these two types have different
+    /// alignments. The buffer was allocated with alignment 2 (for `u16`), but after
+    /// turning it into a `Vec<u8>` it'll be deallocated with alignment 1.
+    ///
+    /// The ownership of `ptr` is effectively transferred to the
+    /// `Vec<T>` which may then deallocate, reallocate or change the
+    /// contents of memory pointed to by the pointer at will. Ensure
+    /// that nothing else uses the pointer after calling this
+    /// function.
+    ///
+    /// [`String`]: crate::string::String
+    /// [`dealloc`]: crate::alloc::GlobalAlloc::dealloc
+    /// [*currently allocated*]: crate::alloc::Allocator#currently-allocated-memory
+    /// [*fit*]: crate::alloc::Allocator#memory-fitting
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// #![feature(allocator_api)]
+    ///
+    /// use std::alloc::System;
+    ///
+    /// use std::ptr;
+    /// use std::mem;
+    ///
+    /// let mut v = Vec::with_capacity_in(3, System);
+    /// v.push(1);
+    /// v.push(2);
+    /// v.push(3);
+    ///
+    // FIXME Update this when vec_into_raw_parts is stabilized
+    /// // Prevent running `v`'s destructor so we are in complete control
+    /// // of the allocation.
+    /// let mut v = mem::ManuallyDrop::new(v);
+    ///
+    /// // Pull out the various important pieces of information about `v`
+    /// let p = v.as_mut_ptr();
+    /// let len = v.len();
+    /// let cap = v.capacity();
+    /// let alloc = v.allocator();
+    ///
+    /// unsafe {
+    ///     // Overwrite memory with 4, 5, 6
+    ///     for i in 0..len {
+    ///         ptr::write(p.add(i), 4 + i);
+    ///     }
+    ///
+    ///     // Put everything back together into a Vec
+    ///     let rebuilt = Vec::from_raw_parts_in(p, len, cap, alloc.clone());
+    ///     assert_eq!(rebuilt, [4, 5, 6]);
+    /// }
+    /// ```
+    ///
+    /// Using memory that was allocated elsewhere:
+    ///
+    /// ```rust
+    /// use std::alloc::{alloc, Layout};
+    ///
+    /// fn main() {
+    ///     let layout = Layout::array::<u32>(16).expect("overflow cannot happen");
+    ///     let vec = unsafe {
+    ///         let mem = alloc(layout).cast::<u32>();
+    ///         if mem.is_null() {
+    ///             return;
+    ///         }
+    ///
+    ///         mem.write(1_000_000);
+    ///
+    ///         Vec::from_raw_parts(mem, 1, 16)
+    ///     };
+    ///
+    ///     assert_eq!(vec, &[1_000_000]);
+    ///     assert_eq!(vec.capacity(), 16);
+    /// }
+    /// ```
+    #[inline]
+    #[unstable(feature = "allocator_api", issue = "32838")]
+    pub unsafe fn from_raw_parts_in(ptr: *mut T, length: usize, capacity: usize, alloc: A) -> Self {
+        unsafe { Self::from_raw_parts_in_co(ptr, length, capacity, alloc) }
     }
 }
 
@@ -657,7 +788,7 @@ where
     #[inline]
     #[unstable(feature = "global_co_alloc", issue = "none")]
     pub unsafe fn from_raw_parts_co(ptr: *mut T, length: usize, capacity: usize) -> Self {
-        unsafe { Self::from_raw_parts_in(ptr, length, capacity, Global) }
+        unsafe { Self::from_raw_parts_in_co(ptr, length, capacity, Global) }
     }
 }
 
@@ -777,23 +908,10 @@ impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Vec<T, A, CO_ALLOC_PREF>
 where
     [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
 {
-    /// Constructs a new, empty `Vec<T, A>`.
-    ///
-    /// The vector will not allocate until elements are pushed onto it.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(allocator_api)]
-    ///
-    /// use std::alloc::System;
-    ///
-    /// # #[allow(unused_mut)]
-    /// let mut vec: Vec<i32, _> = Vec::new_in(System);
-    /// ```
+    /** Like `new_in`, but co-allocation-aware. */
     #[inline]
-    #[unstable(feature = "allocator_api", issue = "32838")]
-    pub const fn new_in(alloc: A) -> Self {
+    #[unstable(feature = "global_co_alloc", issue = "none")]
+    pub const fn new_in_co(alloc: A) -> Self {
         Vec { buf: RawVec::new_in(alloc), len: 0 }
     }
 
@@ -805,114 +923,15 @@ where
         Vec { buf: RawVec::with_capacity_in(capacity, alloc), len: 0 }
     }
 
-    /// Creates a `Vec<T, A>` directly from a pointer, a capacity, a length,
-    /// and an allocator.
-    ///
-    /// # Safety
-    ///
-    /// This is highly unsafe, due to the number of invariants that aren't
-    /// checked:
-    ///
-    /// * `ptr` must be [*currently allocated*] via the given allocator `alloc`.
-    /// * `T` needs to have the same alignment as what `ptr` was allocated with.
-    ///   (`T` having a less strict alignment is not sufficient, the alignment really
-    ///   needs to be equal to satisfy the [`dealloc`] requirement that memory must be
-    ///   allocated and deallocated with the same layout.)
-    /// * The size of `T` times the `capacity` (ie. the allocated size in bytes) needs
-    ///   to be the same size as the pointer was allocated with. (Because similar to
-    ///   alignment, [`dealloc`] must be called with the same layout `size`.)
-    /// * `length` needs to be less than or equal to `capacity`.
-    /// * The first `length` values must be properly initialized values of type `T`.
-    /// * `capacity` needs to [*fit*] the layout size that the pointer was allocated with.
-    /// * The allocated size in bytes must be no larger than `isize::MAX`.
-    ///   See the safety documentation of [`pointer::offset`].
-    ///
-    /// These requirements are always upheld by any `ptr` that has been allocated
-    /// via `Vec<T, A>`. Other allocation sources are allowed if the invariants are
-    /// upheld.
-    ///
-    /// Violating these may cause problems like corrupting the allocator's
-    /// internal data structures. For example it is **not** safe
-    /// to build a `Vec<u8>` from a pointer to a C `char` array with length `size_t`.
-    /// It's also not safe to build one from a `Vec<u16>` and its length, because
-    /// the allocator cares about the alignment, and these two types have different
-    /// alignments. The buffer was allocated with alignment 2 (for `u16`), but after
-    /// turning it into a `Vec<u8>` it'll be deallocated with alignment 1.
-    ///
-    /// The ownership of `ptr` is effectively transferred to the
-    /// `Vec<T>` which may then deallocate, reallocate or change the
-    /// contents of memory pointed to by the pointer at will. Ensure
-    /// that nothing else uses the pointer after calling this
-    /// function.
-    ///
-    /// [`String`]: crate::string::String
-    /// [`dealloc`]: crate::alloc::GlobalAlloc::dealloc
-    /// [*currently allocated*]: crate::alloc::Allocator#currently-allocated-memory
-    /// [*fit*]: crate::alloc::Allocator#memory-fitting
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// #![feature(allocator_api)]
-    ///
-    /// use std::alloc::System;
-    ///
-    /// use std::ptr;
-    /// use std::mem;
-    ///
-    /// let mut v = Vec::with_capacity_in(3, System);
-    /// v.push(1);
-    /// v.push(2);
-    /// v.push(3);
-    ///
-    // FIXME Update this when vec_into_raw_parts is stabilized
-    /// // Prevent running `v`'s destructor so we are in complete control
-    /// // of the allocation.
-    /// let mut v = mem::ManuallyDrop::new(v);
-    ///
-    /// // Pull out the various important pieces of information about `v`
-    /// let p = v.as_mut_ptr();
-    /// let len = v.len();
-    /// let cap = v.capacity();
-    /// let alloc = v.allocator();
-    ///
-    /// unsafe {
-    ///     // Overwrite memory with 4, 5, 6
-    ///     for i in 0..len {
-    ///         ptr::write(p.add(i), 4 + i);
-    ///     }
-    ///
-    ///     // Put everything back together into a Vec
-    ///     let rebuilt = Vec::from_raw_parts_in(p, len, cap, alloc.clone());
-    ///     assert_eq!(rebuilt, [4, 5, 6]);
-    /// }
-    /// ```
-    ///
-    /// Using memory that was allocated elsewhere:
-    ///
-    /// ```rust
-    /// use std::alloc::{alloc, Layout};
-    ///
-    /// fn main() {
-    ///     let layout = Layout::array::<u32>(16).expect("overflow cannot happen");
-    ///     let vec = unsafe {
-    ///         let mem = alloc(layout).cast::<u32>();
-    ///         if mem.is_null() {
-    ///             return;
-    ///         }
-    ///
-    ///         mem.write(1_000_000);
-    ///
-    ///         Vec::from_raw_parts(mem, 1, 16)
-    ///     };
-    ///
-    ///     assert_eq!(vec, &[1_000_000]);
-    ///     assert_eq!(vec.capacity(), 16);
-    /// }
-    /// ```
+    /** Like `from_raw_parts_in`, but co-allocation-aware. */
     #[inline]
-    #[unstable(feature = "allocator_api", issue = "32838")]
-    pub unsafe fn from_raw_parts_in(ptr: *mut T, length: usize, capacity: usize, alloc: A) -> Self {
+    #[unstable(feature = "global_co_alloc", issue = "none")]
+    pub unsafe fn from_raw_parts_in_co(
+        ptr: *mut T,
+        length: usize,
+        capacity: usize,
+        alloc: A,
+    ) -> Self {
         unsafe { Vec { buf: RawVec::from_raw_parts_in(ptr, capacity, alloc), len: length } }
     }
 
@@ -2643,7 +2662,7 @@ where
         // `new_cap * size_of::<T>()` == `cap * size_of::<[T; N]>()`
         // - `len` <= `cap`, so `len * N` <= `cap * N`.
         unsafe {
-            Vec::<T, A, CO_ALLOC_PREF>::from_raw_parts_in(ptr.cast(), new_len, new_cap, alloc)
+            Vec::<T, A, CO_ALLOC_PREF>::from_raw_parts_in_co(ptr.cast(), new_len, new_cap, alloc)
         }
     }
 }
