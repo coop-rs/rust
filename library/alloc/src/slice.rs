@@ -644,7 +644,12 @@ impl<T> [T] {
         hack::into_vec(self)
     }
 
-    /// Coallocation-aware version of [into_vec::<A>()].
+    /// Coallocation-aware version of [`into_vec<A>()`].
+    /// Coallocation-aware version of [`into_vec::<A>()`].
+    /// Coallocation-aware version of [`into_vec<A>(self)`].
+    /// Coallocation-aware version of [`into_vec::<A>(self)`].
+    /// Coallocation-aware version of [`into_vec<A>(Box<Self, A>)`].
+    /// Coallocation-aware version of [`into_vec::<A>(Box<Self, A>)`].
     #[rustc_allow_incoherent_impl]
     #[unstable(feature = "global_co_alloc", issue = "none")]
     #[inline]
