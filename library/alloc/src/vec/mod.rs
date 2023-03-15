@@ -446,9 +446,7 @@ impl<T> Vec<T> {
     #[stable(feature = "rust1", since = "1.0.0")]
     #[must_use]
     pub const fn new() -> Self {
-        #[allow(unused_braces)]
-        Vec::<T, Global, { CO_ALLOC_PREF_DEFAULT!() }>::new_co()
-        //Self::new_co()
+        Self::new_co()
     }
 
     /// Constructs a new, empty `Vec<T>` with at least the specified capacity.
