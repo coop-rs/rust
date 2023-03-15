@@ -46,14 +46,14 @@ const KV_IDX_CENTER: usize = B - 1;
 const EDGE_IDX_LEFT_OF_CENTER: usize = B - 1;
 const EDGE_IDX_RIGHT_OF_CENTER: usize = B;
 
-/// Workaround https://github.com/rust-lang/rust/issues/108751
+/// Workaround <https://github.com/rust-lang/rust/issues/108751>
 macro_rules! leaf_node_capacity {
     () => {
         11
     }; // instead of: CAPACITY
 }
 
-/// Workaround https://github.com/rust-lang/rust/issues/108751
+/// Workaround <https://github.com/rust-lang/rust/issues/108751>
 macro_rules! internal_node_capacity {
     () => {
         12

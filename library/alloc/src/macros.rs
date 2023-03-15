@@ -154,7 +154,7 @@ macro_rules! check_type_and_cast {
 }
 
 // ----- CoAlloc constant-like macros:
-/// Coallocation option/parameter about using metadata that does prefer to use meta data. This is of type [::alloc::co_alloc::CoAllocMetaNumSlotsPref] (but not a whole []::alloc::co_alloc::CoAllocPref]).
+/// Coallocation option/parameter about using metadata that does prefer to use meta data. This is of type [co_alloc::CoAllocMetaNumSlotsPref] (but not a whole [co_alloc::CoAllocPref]).
 #[doc(hidden)]
 #[unstable(feature = "global_co_alloc_meta", issue = "none")]
 #[macro_export]
@@ -164,7 +164,7 @@ macro_rules! CO_ALLOC_PREF_NUM_META_SLOTS_ONE {
     };
 }
 
-/// Coallocation option/parameter about using metadata that prefers NOT to use meta data. This is of type [::alloc::co_alloc::CoAllocMetaNumSlotsPref] (but not a whole []::alloc::co_alloc::CoAllocPref]).
+/// Coallocation option/parameter about using metadata that prefers NOT to use meta data. This is of type [co_alloc::CoAllocMetaNumSlotsPref] (but not a whole [co_alloc::CoAllocPref]).
 #[unstable(feature = "global_co_alloc_meta", issue = "none")]
 #[macro_export]
 macro_rules! CO_ALLOC_PREF_NUM_META_SLOTS_ZERO {
@@ -237,7 +237,7 @@ macro_rules! CO_ALLOC_PREF_META_DEFAULT {
     };
 }
 
-/// Default [::alloc::CoAllocPref] value/config, based on `CO_ALLOC_PREF_META_DEFAULT`.
+/// Default [co_alloc::CoAllocPref] value/config, based on `CO_ALLOC_PREF_META_DEFAULT`.
 #[unstable(feature = "global_co_alloc_meta", issue = "none")]
 #[macro_export]
 macro_rules! CO_ALLOC_PREF_DEFAULT {
@@ -294,7 +294,7 @@ macro_rules! co_alloc_pref {
 /// preference for coallocation, as an [::alloc::CoAllocPref] value.
 ///
 /// The type of second parameter `co_alloc_pref` WILL CHANGE. DO NOT hardcode/cast/mix that type.
-/// Instead, use [::alloc::CoAllocPref].
+/// Instead, use [co_alloc::CoAllocPref].
 ///
 // FIXME replace the macro with an (updated version of the below) `const` function). Only once
 // generic_const_exprs is stable (that is, when consumer crates don't need to declare
