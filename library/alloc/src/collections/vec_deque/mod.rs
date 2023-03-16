@@ -2872,7 +2872,7 @@ impl<T, const CO_ALLOC_PREF: CoAllocPref> VecDeque<T, Global, CO_ALLOC_PREF>
 where
     [(); { crate::meta_num_slots_global!(CO_ALLOC_PREF) }]:,
 {
-    /// Like [`<VecDeque::<T>>::from_iter()`], but coallocation-aware.
+    /// Like `<VecDeque::<T>>::from_iter()`, but coallocation-aware.
     /// Like [`VecDeque::<T>::from_iter()`], but coallocation-aware.
     /// Like [`<VecDeque::<T>>::from_iter(I)`], but coallocation-aware.
     /// Like [`VecDeque::<T>::from_iter(I)`], but coallocation-aware.

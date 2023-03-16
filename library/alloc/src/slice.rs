@@ -644,8 +644,8 @@ impl<T> [T] {
         hack::into_vec(self)
     }
 
-    /// Coallocation-aware version of [`into_vec<A>()`].
-    /// Coallocation-aware version of [`into_vec::<A>()`].
+    /// Coallocation-aware version of `into_vec<A>()`.
+    /// Coallocation-aware version of `into_vec::<A>()`.
     /// Coallocation-aware version of [`into_vec<A>(self)`].
     /// Coallocation-aware version of [`into_vec::<A>(self)`].
     /// Coallocation-aware version of [`into_vec<A>(Box<Self, A>)`].
