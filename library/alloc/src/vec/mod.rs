@@ -908,14 +908,14 @@ impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Vec<T, A, CO_ALLOC_PREF>
 where
     [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
 {
-    /** Like `new_in`, but co-allocation-aware. */
+    /// Coallocation-aware version of [Vec<T,A>::new_in()].
     #[inline]
     #[unstable(feature = "global_co_alloc", issue = "none")]
     pub const fn new_in_co(alloc: A) -> Self {
         Vec { buf: RawVec::new_in(alloc), len: 0 }
     }
 
-    /** Like `with_capacity_in`, but co-allocation-aware. */
+    /// Coallocation-aware version of [Vec<T,A>::with_capacity_in()].
     #[cfg(not(no_global_oom_handling))]
     #[inline]
     #[unstable(feature = "global_co_alloc", issue = "none")]
@@ -923,7 +923,7 @@ where
         Vec { buf: RawVec::with_capacity_in(capacity, alloc), len: 0 }
     }
 
-    /** Like `from_raw_parts_in`, but co-allocation-aware. */
+    /// Coallocation-aware version of [Vec<T,A>::from_raw_parts_in()].
     #[inline]
     #[unstable(feature = "global_co_alloc", issue = "none")]
     pub unsafe fn from_raw_parts_in_co(

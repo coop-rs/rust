@@ -1,13 +1,12 @@
 #![cfg(target_thread_local)]
 #![unstable(feature = "thread_local_internals", issue = "none")]
-#![feature(global_co_alloc_plvec)]
 
 // Simplify dtor registration by using a list of destructors.
 // The this solution works like the implementation of macOS and
 // doesn't additional OS support
 
 use crate::mem;
-use core::alloc::PlVec;
+use alloc::vec::PlVec;
 
 #[thread_local]
 static mut DTORS: PlVec<(*mut u8, unsafe extern "C" fn(*mut u8))> = PlVec::new();

@@ -53,6 +53,7 @@ pub unsafe fn register_dtor(t: *mut u8, dtor: unsafe extern "C" fn(*mut u8)) {
     use crate::cell::Cell;
     use crate::mem;
     use crate::ptr;
+    use alloc::vec::PlVec;
 
     #[thread_local]
     static REGISTERED: Cell<bool> = Cell::new(false);
@@ -63,15 +64,6 @@ pub unsafe fn register_dtor(t: *mut u8, dtor: unsafe extern "C" fn(*mut u8)) {
     if !REGISTERED.get() {
         _tlv_atexit(run_dtors, ptr::null_mut());
         REGISTERED.set(true);
-    }
-
-    type List = alloc::vec::PlVec<(*mut u8, unsafe extern "C" fn(*mut u8))>;
-
-    #[thread_local]
-    static DTORS: Cell<*mut List> = Cell::new(ptr::null_mut());
-    if DTORS.get().is_null() {
-        let v: Box<List> = Box::new(Vec::new());
-        DTORS.set(Box::into_raw(v));
     }
 
     extern "C" {

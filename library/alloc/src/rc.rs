@@ -275,6 +275,7 @@ use crate::alloc::handle_alloc_error;
 use crate::alloc::{box_free, WriteCloneIntoRaw};
 use crate::alloc::{AllocError, Allocator, Global, Layout};
 use crate::borrow::{Cow, ToOwned};
+#[cfg(not(no_global_oom_handling))]
 use crate::co_alloc::CoAllocPref;
 #[cfg(not(no_global_oom_handling))]
 use crate::string::String;

@@ -1,14 +1,12 @@
 #![cfg(target_thread_local)]
 #![unstable(feature = "thread_local_internals", issue = "none")]
-#![feature(global_co_alloc_plvec)]
-#![feature(global_co_alloc_plvec)]
 
 // Simplify dtor registration by using a list of destructors.
 
 use super::{abi, itron::task};
 use crate::cell::Cell;
 use crate::mem;
-use core::alloc::PlVec;
+use alloc::vec::PlVec;
 
 #[thread_local]
 static REGISTERED: Cell<bool> = Cell::new(false);

@@ -146,6 +146,7 @@
 
 #![stable(feature = "rust1", since = "1.0.0")]
 
+#[cfg(not(no_global_oom_handling))]
 use crate::co_alloc::CoAllocPref;
 use core::any::Any;
 use core::async_iter::AsyncIterator;

@@ -3,9 +3,8 @@
 
 #![unstable(feature = "thread_local_internals", issue = "none")]
 #![cfg(target_thread_local)]
-#![feature(global_co_alloc_plvec)]
 
-use core::alloc::PlVec;
+use alloc::vec::PlVec;
 
 // Using a per-thread list avoids the problems in synchronizing global state.
 #[thread_local]
