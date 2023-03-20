@@ -39,8 +39,6 @@ help: try using a conversion method
    |
 LL |     let _prove_piercing_earnest: Vec<usize> = (&[1, 2, 3]).to_vec();
    |                                               +          ++++++++++
-LL |     let _prove_piercing_earnest: Vec<usize> = (&[1, 2, 3]).to_vec_co();
-   |                                               +          +++++++++++++
 
 error: aborting due to 4 previous errors
 

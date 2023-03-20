@@ -2,14 +2,9 @@ error[E0308]: mismatched types
   --> $DIR/unused-substs-5.rs:15:9
    |
 LL |     x = q::<_, N>(x);
-   |         ^^^^^^^^^^^^ cyclic type of infinite size
-   |
-help: try using a conversion method
-   |
-LL |     x = q::<_, N>(x).to_vec();
-   |                     +++++++++
-LL |     x = q::<_, N>(x).to_vec_co();
-   |                     ++++++++++++
+   |         ^^^^^^^^^^^^- help: try using a conversion method: `.to_vec()`
+   |         |
+   |         cyclic type of infinite size
 
 error: aborting due to previous error
 
