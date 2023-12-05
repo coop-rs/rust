@@ -2721,7 +2721,7 @@ where
 }
 
 #[allow(unused_braces)]
-impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Vec<T, A, CO_ALLOC_PREF>
+impl<T: Clone, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Vec<T, A, CO_ALLOC_PREF>
 where
     [(); { crate::meta_num_slots!(A, CO_ALLOC_PREF) }]:,
 {

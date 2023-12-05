@@ -744,7 +744,7 @@ impl<T> Box<[T]> {
         };
         unsafe {
             Ok(RawVec::<T, Global, { CO_ALLOC_PREF_META_NO!() }>::from_raw_parts_in(
-                ptr.as_mut_ptr(),
+                ptr.as_ptr(),
                 len,
                 Global,
             )
@@ -1521,7 +1521,7 @@ trait BoxFromSlice<T> {
 impl<T: Clone> BoxFromSlice<T> for Box<[T]> {
     #[inline]
     default fn from_slice(slice: &[T]) -> Self {
-        slice.to_vec().into_boxed_slice()
+        slice.to_vec_co::<{ CO_ALLOC_PREF_META_NO!() }>().into_boxed_slice()
     }
 }
 
@@ -1530,7 +1530,7 @@ impl<T: Copy> BoxFromSlice<T> for Box<[T]> {
     #[inline]
     fn from_slice(slice: &[T]) -> Self {
         let len = slice.len();
-        let buf = RawVec::with_capacity(len);
+        let buf = RawVec::<T, Global, { CO_ALLOC_PREF_META_NO!() }>::with_capacity(len);
         unsafe {
             ptr::copy_nonoverlapping(slice.as_ptr(), buf.ptr(), len);
             buf.into_box(slice.len()).assume_init()

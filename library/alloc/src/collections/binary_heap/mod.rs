@@ -1319,7 +1319,6 @@ impl<T, A: Allocator> BinaryHeap<T, A> {
     /// ```
     #[inline]
     #[stable(feature = "drain", since = "1.6.0")]
-    pub fn drain(&mut self) -> Drain<'_, T, A> {
     #[allow(unused_braces)]
     pub fn drain(&mut self) -> Drain<'_, T, A, { SHORT_TERM_VEC_CO_ALLOC_PREF!() }> {
         Drain { iter: self.data.drain(..) }
@@ -1641,7 +1640,7 @@ pub struct Drain<
     'a,
     T: 'a,
     #[unstable(feature = "allocator_api", issue = "32838")] A: Allocator = Global,
-    #[unstable(feature = "global_co_alloc_drain", issue = "none")] const CO_ALLOC_PREF: CoAllocPref = { CO_ALLOC_PREF_DEFAULT!() },
+    /*#[unstable(feature = "global_co_alloc_drain", issue = "none")]*/ const CO_ALLOC_PREF: CoAllocPref = { CO_ALLOC_PREF_DEFAULT!() },
 >
 where
     [(); { meta_num_slots_global!(CO_ALLOC_PREF) }]:,
@@ -1663,7 +1662,7 @@ where
 
 #[stable(feature = "drain", since = "1.6.0")]
 #[allow(unused_braces)]
-impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Iterator for Drain<'_, T, A, CO_ALLOC_PREF> {
+impl<T, A: Allocator, const CO_ALLOC_PREF: CoAllocPref> Iterator for Drain<'_, T, A, CO_ALLOC_PREF>
 where
     [(); { meta_num_slots_global!(CO_ALLOC_PREF) }]:,
 {

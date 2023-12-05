@@ -2526,7 +2526,7 @@ where
     /// ```
     #[inline]
     #[allow(unused_braces)]
-    fn from(mut v: Vec<T, A, CO_ALLOC_PREF>) -> Rc<[T], A>
+    fn from(v: Vec<T, A, CO_ALLOC_PREF>) -> Rc<[T], A>
     where
         [(); { meta_num_slots_global!(CO_ALLOC_PREF) }]:,
     {

@@ -1,7 +1,7 @@
 //! CoAlloction-specific types that only apply in heap-based applications (hence not a part of
 //!  [::core]).
 //!
-//! Types here have names with `CoAlloc` prefix. Yes, when using a q ualified path (like
+//! Types here have names with `CoAlloc` prefix. Yes, when using a qualified path (like
 //! ::alloc::co_alloc::CoAllocPref), that involves "stuttering", which is not recommended.
 //!
 //! However, as per Rust Book the common practice is to import type names fully and access them just
